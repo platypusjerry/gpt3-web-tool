@@ -9,8 +9,8 @@ import streamlit as st
 
 from gpt3 import *
 
-openai.api_key = "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"
 
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
 
