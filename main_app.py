@@ -36,7 +36,7 @@ generator.add_example(Example('Write an email with the following traits-\nTone: 
 
 
 st.title("GPT-3 Webapp by CadenceIQ")
-st.header("A handy GPT-3 webapp to generate accurate emails relevant to your use-case")
+st.header("A handy GPT-3 web application to generate accurate emails relevant to your use-case")
 
 html_temp = """
 <div style="background-color:#A7E8AE ;padding:10px">
