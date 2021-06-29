@@ -5,6 +5,7 @@ Created on Tue Jun 29 04:09:22 2021
 @author: ADI
 """
 import openai
+import os
 import streamlit as st
 
 from gpt3 import *
