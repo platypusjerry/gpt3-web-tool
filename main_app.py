@@ -5,13 +5,12 @@ Created on Tue Jun 29 04:09:22 2021
 @author: ADI
 """
 import openai
-import os
 import streamlit as st
 
-
+import config
 from gpt3 import *
 
-openai.api_key = "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"
+openai.api_key = config.api_key
 
 
 
