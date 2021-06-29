@@ -10,7 +10,7 @@ import streamlit as st
 import config
 from gpt3 import *
 
-openai.api_key = config.api_key
+openai.api_key = "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"
 
 
 
