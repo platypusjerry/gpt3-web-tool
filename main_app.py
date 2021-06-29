@@ -11,7 +11,7 @@ import streamlit as st
 
 from gpt3 import *
 
-openai.api_key = "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"
+openai.api_key = "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"
 
 
 
