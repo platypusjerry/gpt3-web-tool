@@ -7,7 +7,6 @@ Created on Tue Jun 29 04:09:22 2021
 import openai
 import streamlit as st
 
-import config
 from gpt3 import *
 
 openai.api_key = "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"
