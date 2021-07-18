@@ -1,3 +1,2 @@
 # gpt3-webapp
-
-https://gpt3-webapp.herokuapp.com/
+Webapp for email generation, sentence paraphrasing and semantic similarity search for an intent classification use-case
