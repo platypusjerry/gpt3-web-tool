@@ -3,6 +3,8 @@ API."""
 
 import openai
 import uuid
+from operator import itemgetter
+
 
 
 def set_openai_key(key):
@@ -152,5 +154,96 @@ class GPT:
         ) + self.input_suffix + self.output_prefix + ex.get_output(
         ) + self.output_suffix
             
+
+            
+            
+            
+            
+            
+            
+            
+class semantic():
+    def __init__(self, 
+                 documents):
+        self.documents = documents
         
+        
+    def get_query(self, query):
+        return query
+    
+    def get_documents(self):
+        return self.documents
+    
+
+    
+    
+    
+    
+    def get_score(self, query):
+        search_response = openai.Engine("babbage").search(
+            query = self.get_query(query),
+            documents = self.get_documents()
+            )
+        data_search_response = dict(search_response)
+        intents_list = ['Interested', 'Need Information', 'Unsubscribe',
+                       'Wrong Person', 'Complaint', 'Inquiry', 'Request',
+                       'Feedback', 'Advertisement']
+        scores = []
+        for a,b in data_search_response.items():
+            if a == 'data':
+                data_list = list(data_search_response.values())
+                document_list = data_list[1]
+                
+                for i,j in zip(document_list, intents_list):
+                    document = dict(i)
+                    intent_score = dict((k, document[k]) for k in ['document', 'score']
+                                                if k in document)
+                    intent_score.update(text = j)
+                    scores.append(intent_score)
+                    
+            
+        return scores
+    
+    
+    
+    
+    def intent_filtering(self, raw_score):
+        data = sorted(raw_score, key=itemgetter('score'), reverse=True)
+        for a in range(len(data)):
+            if data[a]["score"] < 0:
+                data[a]["score"] = 0
+        
+        max = 0
+        top_int = []
+        for i in range(len(data)-1):
+            if data[i]["score"] - data[i+1]["score"] > max:
+                max = data[i]["score"] - data[i+1]["score"]
+                top_int.append(data[i])
+                
+        return_list = []
+        for a in range(len(top_int)):
+            return_list.append(top_int[a]["text"])
+            
+        str_ = "\n , ".join(return_list)
+        
+        return(str_)
+    
+    
+    
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         
