@@ -128,13 +128,21 @@ class GPT:
             q = q + self.output_prefix
 
         return q
+    
+    def update_temp(self, new_temp):
+        self.temperature = new_temp
+        return self.temperature
+    
+    def update_token(self, new_token):
+        self.max_tokens = new_token
+        return self.max_tokens
 
-    def submit_request(self, prompt):
+    def submit_request(self, prompt, new_token, new_temp):
         """Calls the OpenAI API with the specified parameters."""
         response = openai.Completion.create(engine=self.get_engine(),
                                             prompt=self.craft_query(prompt),
-                                            max_tokens=self.get_max_tokens(),
-                                            temperature=self.get_temperature(),
+                                            max_tokens=self.update_token(new_token),
+                                            temperature=self.update_temp(new_temp),
                                             top_p=self.get_top_p(),
                                             frequency_penalty=self.get_frequency_penalty(),
                                             presence_penalty=self.get_presence_penalty(),

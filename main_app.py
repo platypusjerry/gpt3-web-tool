@@ -39,6 +39,12 @@ gpt_3 = semantic(documents = ['Interested', 'Need Information', 'Unsubscribe',
                        'Feedback', 'Advertisement']
                  )
 
+gpt_4 = GPT(engine="davinci-instruct-beta",
+            temperature=0.8,
+            max_tokens=150,
+            top_p=1,
+            frequency_penalty=0.5,
+            presence_penalty=0.5)
 
 
 
@@ -84,7 +90,7 @@ st.markdown(html_temp, unsafe_allow_html=True)
 
 
 st.sidebar.header("CHOOSE TASK")
-box = st.sidebar.selectbox(" ", ["E-mail Generation", "Sentence Paraphrasing", "Semantic Search"])
+box = st.sidebar.selectbox(" ", ["E-mail Generation", "Sentence Paraphrasing", "Semantic Search", "Custom Email"])
 
 if box == 'E-mail Generation':
     st.markdown('#')
@@ -96,7 +102,7 @@ if box == 'E-mail Generation':
 
     prompt = "Write an email with the following traits-\nTone: " + ', '.join(box2) +  "\nTopics: " + ', '.join(topics)
     #st.text(prompt)
-    output = gpt_1.submit_request(prompt)
+    output = gpt_1.submit_request(prompt, 100, 0.7)
 
     if st.button("submit text"):
         st.text("GENERATED EMAIL:")
@@ -105,7 +111,6 @@ if box == 'E-mail Generation':
         
         
         
-
 
 elif box == 'Semantic Search':
     st.markdown('#')
@@ -118,10 +123,57 @@ elif box == 'Semantic Search':
         intents = gpt_3.intent_filtering(int_scores)
         st.text("top intents classified:")
         st.info(intents)
-    
+        
+     
+        
+elif box == 'Custom Email':
+    st.markdown('#')
+    st.markdown('**Generate an E-Mail with the given template instructions**')
     
 
+    
+    col1, col2 = st.beta_columns(2)
+    
+    with col1:
+         with st.form('Form1'):
+                a = st.text_input("Enter recipient's designation")
+                b = st.text_input("Reason for emailing")
+                c = st.text_input("Intent")
+                d = st.text_area("Product details, features and benefits", height=160)
+                e = st.text_input("Call to action")
+                submitted1 = st.form_submit_button('Save responses')
 
+    with col2:
+        with st.form('Form2'):
+            box3 = st.multiselect("Select tones", ["Happy", "Sad","Excited", "Angry", "Tentative", "Formal", "Informal", "Confused", "Analytical", "Confident", "Interested", "Uninterested"])
+            slider1 = st.select_slider('Select length of Email', options=['brief', 'regular', 'detailed'])
+            slider2 = st.select_slider("Creativity level", options=['Low', 'Medium', 'High'])
+            submitted2 = st.form_submit_button('Save settings')
+    
+    if slider1 == 'brief':
+        token = 64
+    elif slider1 == 'regular':
+        token = 100
+    else:
+        token = 150
+        
+    if slider2 == 'Low':
+        temp = 0.3
+    elif slider2 == 'Medium':
+        temp = 0.5
+    else:
+        temp = 0.7
+        
+    prompt_input3 = "Soham is the founder of CadenceIQ. Write a " + slider1 + " personalized cold email on behalf of Soham with the following features;\n" + "Recipient: " + a + "\nReason for emailing: " + b + "\nIntent: " + c + "\nTone: " + ', '.join(box3) + "\nProduct features and benefits: " + d + "\nCall to action: " + e + "\nEmail:"
+    
+    st.markdown("#")
+                
+    if st.button("Generate Email"):
+        output3 = gpt_4.submit_request(prompt_input3, token, temp)
+        result3 = output3.choices[0].text
+        st.info(result3)
+        
+    
 
 else:
     st.markdown('#')
@@ -132,8 +184,8 @@ else:
     
     if st.button("submit text"):
         prompt = "Source text: " + prompt_input2.title() + "\nMood: " + mood_input
-        #st.text(prompt)
-        output2 = gpt_2.submit_request(prompt)
+        st.text(prompt)
+        output2 = gpt_2.submit_request(prompt, 125, 0.75)
         st.text("PARAPHRASED SENTENCE:")
         result2 = output2.choices[0].text
         st.info(result2)
