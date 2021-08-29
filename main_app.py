@@ -13,8 +13,7 @@ from gpt3 import *
 
 
 
-#openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = "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"
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 gpt_1 = GPT(engine="davinci-instruct-beta",
                 temperature=0.7,           
