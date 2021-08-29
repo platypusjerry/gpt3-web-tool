@@ -4,12 +4,14 @@ API."""
 import openai
 import uuid
 from operator import itemgetter
+import requests
+import json
 
 
 
-def set_openai_key(key):
-    """Sets OpenAI key."""
-    openai.api_key = key
+#def set_openai_key(key):
+#   """Sets OpenAI key."""
+#    openai.api_key = key
 
 
 class Example:
@@ -51,7 +53,8 @@ class GPT:
                  top_p,
                  frequency_penalty,
                  presence_penalty,
-                 input_prefix=" ",
+                 stop = None,
+                 input_prefix="",
                  input_suffix="\n",
                  output_prefix=" ",
                  output_suffix="\n\n",
@@ -68,7 +71,7 @@ class GPT:
         self.output_prefix = output_prefix
         self.output_suffix = output_suffix
         self.append_output_prefix_to_query = append_output_prefix_to_query
-        self.stop = (output_suffix + input_prefix).strip()
+        self.stop = stop
 
     def add_example(self, ex):
         """Adds an example to the object.
@@ -167,11 +170,15 @@ class GPT:
             
             
             
-class semantic():
-    def __init__(self, 
+class Semantic():
+    def __init__(self,
+                 engine,
                  documents):
+        self.engine = engine
         self.documents = documents
         
+    def get_engine(self):
+        return self.engine
         
     def get_query(self, query):
         return query
@@ -185,14 +192,12 @@ class semantic():
     
     
     def get_score(self, query):
-        search_response = openai.Engine("babbage").search(
+        search_response = openai.Engine(self.get_engine()).search(
             query = self.get_query(query),
             documents = self.get_documents()
             )
         data_search_response = dict(search_response)
-        intents_list = ['Interested', 'Need Information', 'Unsubscribe',
-                       'Wrong Person', 'Complaint', 'Inquiry', 'Request',
-                       'Feedback', 'Advertisement']
+        intents_list = self.documents.copy()
         scores = []
         for a,b in data_search_response.items():
             if a == 'data':
@@ -228,10 +233,61 @@ class semantic():
         return_list = []
         for a in range(len(top_int)):
             return_list.append(top_int[a]["text"])
+        
+        if len(return_list) > 4:
+            return return_list[0:3]
             
-        str_ = "\n , ".join(return_list)
+        str_ = ", ".join(return_list)
         
         return(str_)
+    
+    
+class Jurassic():
+    def __init__(self, primer, suffix, numresult, temp, stopseq):
+        self.primer = primer
+        self.suffix = suffix
+        self.numresult = numresult
+        self.temp = temp
+        self.stopseq = stopseq
+        
+        
+    def get_prompt(self, prompt):
+        q = self.primer + prompt + self.suffix
+        return q
+    
+    def get_numresult(self):
+        return self.numresult
+    
+    def get_temp(self):
+        return self.temp
+    
+    def get_stopseq(self):
+        return self.stopseq
+    
+    def encoder_test(self, testing):
+        if isinstance(testing, Jurassic):
+            return {'primer' : testing.primer, 'suffix' : testing.suffix, 'numresult' : testing.numresult, 'temp' : testing.temp, 'stopseq' : testing.stopseq}
+        raise TypeError(f'Object {testing} is not of type Jurassic.')
+             
+    def submit_req(self, prompt, testing):
+        
+            resp = requests.post(
+                "https://api.ai21.com/studio/v1/j1-large/complete",
+                headers={"Authorization": "Bearer Ro2nbCuaQXhR6AH2rXysLXfzcAR17FbY"},
+                json={
+                    "prompt": self.get_prompt(prompt), 
+                    "numResults": self.get_numresult(), 
+                    "maxTokens": 10, 
+                    "stopSequences": self.get_stopseq(),
+                    "topKReturn": 0,
+                    "temperature": self.get_temp()
+                }
+            )
+            resp = resp.json()
+            
+            testJSON = json.dumps(resp, default=self.encoder_test(testing), indent=4)
+            testObj = json.loads(testJSON)
+            return testObj["completions"][0]["data"]["text"]
     
     
     
